@@ -1,25 +1,26 @@
-- name: GitHub Action for Yarn
-  uses: Borales/actions-yarn@v2.3.0
+# .github/workflows/nodejs.yml
+name: Node CI
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request] # Run on Push and Pull Requests
 
 jobs:
   build:
+
     runs-on: windows-latest
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
-        
+        node-version: [10.x] # Only run the 10.x build
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: borales/actions-yarn@v2.0.0
-        with:
-          cmd: install # will run `yarn install` command
-      - uses: borales/actions-yarn@v2.0.0
-        with:
-          cmd: package # will run `yarn package` command
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install -g yarn
+    - name: yarn install, build, and test
+      run: |
+        yarn
+        yarn build
+        yarn test
